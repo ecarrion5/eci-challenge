@@ -138,6 +138,26 @@ curl -s localhost:8000/api/v1/purchase-orders -H 'Content-Type: application/json
 Vendor ids are UUIDs created by the seed, and there is no vendor API yet. The quickest way to get ACME's id is through the agent:
 `say "Show PO-2026-0001"`, then read `api_response.body.vendor_id`. The `id`s of the PO and its lines are in the same response.
 
+### 4. Clean up when you're done
+
+1. **Stop the server.** Press `Ctrl+C` in the terminal running uvicorn. If it runs in the background, use:
+   ```bash
+   kill $(pgrep -f "uvicorn app.main:app")
+   ```
+   Stop it before step 2, so nothing is writing to the database.
+2. **Remove the test data (optional).** Testing leaves POs, invoices and the `SMOKE_INACTIVE` vendor in `eci.db`. Either:
+   ```bash
+   python -m app.seed --reset          # back to just the seed data
+   rm eci.db eci.db-shm eci.db-wal     # or delete the database entirely
+   ```
+   After a delete, the server recreates empty tables on its next start, and `python -m app.seed` refills them.
+3. **Clear the Python caches (optional).** They are harmless and get recreated:
+   ```bash
+   find app -name __pycache__ -exec rm -rf {} +
+   ```
+
+Keep `.venv` if you plan to run the project again.
+
 ## Project layout
 
 ```text
